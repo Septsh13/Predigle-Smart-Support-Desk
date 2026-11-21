@@ -1,0 +1,77 @@
+<div
+  class="app-shell"
+  [class.sidebar-collapsed]="sidebarCollapsed()"
+  [class.mobile-open]="mobileSidebarOpen()"
+>
+  <aside class="sidebar" aria-label="Main navigation">
+    <a class="brand" routerLink="/dashboard" (click)="closeMobileSidebar()">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-copy">
+        <strong>Smart Support Desk</strong>
+        <small>HELP CENTER</small>
+      </span>
+    </a>
+
+    <nav class="side-nav" aria-label="Main menu">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" aria-label="Dashboard" (click)="closeMobileSidebar()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a routerLink="/tickets" routerLinkActive="active" aria-label="All tickets" (click)="closeMobileSidebar()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v3a3 3 0 0 0 0 6v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a3 3 0 0 0 0-6V6a2 2 0 0 1 2-2Z"/><path d="M13 8v2m0 4v2"/></svg>
+        <span class="nav-label">All tickets</span>
+      </a>
+      <a routerLink="/knowledge-base" routerLinkActive="active" aria-label="Knowledge base" (click)="closeMobileSidebar()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21Z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h8"/></svg>
+        <span class="nav-label">Knowledge base</span>
+      </a>
+      <a routerLink="/settings" routerLinkActive="active" aria-label="Settings" (click)="closeMobileSidebar()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 1 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 1 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 1 1-2.4-2.4l.1-.1a1.7 1.7 0 0 0-1.2-2.9H4a1.7 1.7 0 1 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 1 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 1 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 1 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 1 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg>
+        <span class="nav-label">Settings</span>
+      </a>
+    </nav>
+
+    <div class="profile-block">
+      <div class="avatar" aria-hidden="true">{{ roleService.role() === 'agent' ? 'SA' : 'U' }}</div>
+      <div class="profile-copy">
+        <strong>{{ roleService.role() === 'agent' ? 'Support Agent' : 'User' }}</strong>
+        <small>Demo workspace</small>
+      </div>
+    </div>
+  </aside>
+
+  @if (mobileSidebarOpen()) {
+    <button class="mobile-overlay" type="button" aria-label="Close navigation" (click)="closeMobileSidebar()"></button>
+  }
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="page-heading">
+        <button class="hamburger" type="button" aria-label="Toggle navigation" (click)="toggleSidebar()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <div class="breadcrumb">Support <span>/</span> {{ pageTitle() }}</div>
+          <h1>{{ pageTitle() }}</h1>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="role-control">
+          <span class="demo-label">Demo role</span>
+          <div class="role-switch" aria-label="Choose demo role">
+            <button type="button" [class.selected]="roleService.role() === 'user'" [attr.aria-pressed]="roleService.role() === 'user'" (click)="setRole('user')">User</button>
+            <button type="button" [class.selected]="roleService.role() === 'agent'" [attr.aria-pressed]="roleService.role() === 'agent'" (click)="setRole('agent')">Support Agent</button>
+          </div>
+        </div>
+        <a class="primary-button new-ticket" routerLink="/tickets/new">
+          <span aria-hidden="true">+</span> New ticket
+        </a>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

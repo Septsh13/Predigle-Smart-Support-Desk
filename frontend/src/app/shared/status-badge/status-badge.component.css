@@ -1,0 +1,4 @@
+.status-badge { display: inline-flex; min-height: 24px; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.status-badge.open { background: var(--open-bg); color: var(--open-text); }
+.status-badge.progress { background: var(--progress-bg); color: var(--progress-text); }
+.status-badge.resolved { background: var(--resolved-bg); color: var(--resolved-text); }

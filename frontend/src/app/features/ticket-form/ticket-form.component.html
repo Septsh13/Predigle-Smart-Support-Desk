@@ -1,0 +1,123 @@
+<section class="create-ticket-page">
+  <div class="page-intro">
+    <div><p class="eyebrow">SUPPORT REQUEST</p><h2>Create a ticket</h2><p>Tell us what happened and we’ll help you find a next step.</p></div>
+  </div>
+
+  @if (generalError()) {
+    <div class="error-banner" role="alert">{{ generalError() }}</div>
+  }
+
+  <div class="create-layout">
+    <article class="form-card">
+      <header class="card-heading"><h3>Issue details</h3><span>All fields are required</span></header>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-field">
+          <div class="label-row">
+            <label for="new-ticket-title">Title</label>
+            <span class="character-count">{{ form.controls.title.value.length }}/150</span>
+          </div>
+          <input
+            #titleInput
+            id="new-ticket-title"
+            type="text"
+            required
+            maxlength="150"
+            formControlName="title"
+            placeholder="Briefly summarize the issue"
+            [attr.aria-invalid]="showFieldError('title')"
+            aria-describedby="title-error"
+          />
+          @if (showFieldError('title')) { <small id="title-error" class="field-error">{{ fieldError('title') }}</small> }
+        </div>
+
+        <div class="form-field">
+          <div class="label-row"><label for="new-ticket-description">Description</label></div>
+          <textarea
+            #descriptionInput
+            id="new-ticket-description"
+            rows="7"
+            required
+            minlength="10"
+            formControlName="description"
+            placeholder="Share what you tried and what happened"
+            [attr.aria-invalid]="showFieldError('description')"
+            aria-describedby="description-error"
+          ></textarea>
+          @if (showFieldError('description')) { <small id="description-error" class="field-error">{{ fieldError('description') }}</small> }
+        </div>
+
+        <div class="form-field category-field">
+          <label for="new-ticket-category">Category</label>
+          <select
+            #categoryInput
+            id="new-ticket-category"
+            required
+            formControlName="category"
+            [attr.aria-invalid]="showFieldError('category')"
+            aria-describedby="category-error"
+          >
+            <option value="">Select a category</option>
+            @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
+          </select>
+          @if (showFieldError('category')) { <small id="category-error" class="field-error">{{ fieldError('category') }}</small> }
+        </div>
+
+        <div class="form-actions">
+          <a class="cancel-link" routerLink="/tickets">Cancel</a>
+          <button class="secondary-button" type="button" [disabled]="!canCheckSimilar || checkingSimilar()" (click)="checkSimilar()">
+            @if (checkingSimilar()) { <span class="button-spinner" aria-hidden="true"></span> }
+            Check similar tickets
+          </button>
+          <button class="primary-button submit-button" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Submitting...' : 'Submit ticket' }}
+          </button>
+        </div>
+      </form>
+    </article>
+
+    <aside class="similar-panel" aria-labelledby="similar-heading">
+      <header class="similar-heading">
+        <div class="sparkle-icon" aria-hidden="true">✦</div>
+        <div><h3 id="similar-heading">Similar resolved tickets</h3><p>Suggested from past ticket descriptions. Review before using a resolution.</p></div>
+      </header>
+
+      @if (similarIsStale()) {
+        <p class="stale-note">Text changed. Check again to refresh suggestions.</p>
+      }
+
+      @if (checkingSimilar()) {
+        <div class="similar-loading" role="status">
+          <span class="loading-spinner" aria-hidden="true"></span>
+          <div><strong>Looking for similar resolved tickets...</strong><small>The first request may take a few seconds.</small></div>
+        </div>
+      } @else if (similarError()) {
+        <div class="similar-error" role="alert">
+          <p>Could not check similar tickets. You can still submit your ticket.</p>
+          <button type="button" class="retry-button" [disabled]="!canCheckSimilar" (click)="retrySimilar()">Retry</button>
+        </div>
+      } @else {
+        @if (similarResponse(); as response) {
+          @if (response.results.length === 0) {
+            <p class="similar-empty">No similar resolved tickets found. You can submit your ticket.</p>
+          } @else {
+            <div class="similar-list">
+              @for (result of response.results.slice(0, 3); track result.id) {
+                <article class="suggestion-card">
+                  <span class="suggestion-meta">{{ shortTicketId(result.id) }} <span aria-hidden="true">·</span> {{ result.category }}</span>
+                  <h4>{{ result.title }}</h4>
+                  <span class="match-label" [class.strong-match]="result.match_label === 'Strong match'" [class.related-match]="result.match_label === 'Related'">{{ result.match_label }}</span>
+                  <p class="resolution-line">Resolved <span aria-hidden="true">·</span> {{ result.resolution_note }}</p>
+                  <a [routerLink]="['/tickets', result.id]" target="_blank" rel="noopener" [attr.aria-label]="'Open details for ' + result.title + ' in a new tab'">Open details <span aria-hidden="true">↗</span></a>
+                </article>
+              }
+            </div>
+          }
+          <p class="disclaimer">{{ response.disclaimer }}</p>
+        } @else {
+          <p class="similar-initial">Fill in the title and description, then click <strong>Check similar tickets</strong>.</p>
+        }
+      }
+    </aside>
+  </div>
+</section>

@@ -1,0 +1,65 @@
+<div class="table-tools">
+  <label class="search-field">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+    <input type="search" placeholder="Search tickets" aria-label="Search tickets" [value]="searchInput" (input)="onSearch($event)" />
+  </label>
+  <div class="filter-selects">
+    <label class="select-field">
+      <span>Status</span>
+      <select aria-label="Filter by status" [value]="filters.status || ''" (change)="onStatusChange($event)">
+        <option value="">All</option>
+        @for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }
+      </select>
+    </label>
+    <label class="select-field">
+      <span>Category</span>
+      <select aria-label="Filter by category" [value]="filters.category || ''" (change)="onCategoryChange($event)">
+        <option value="">All</option>
+        @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
+      </select>
+    </label>
+  </div>
+</div>
+
+@if (showCount) {
+  <div class="table-summary">
+    <p class="results-count">Showing {{ visibleTickets.length }} of {{ totalCount }} tickets</p>
+    @if (hasActiveFilters) { <button class="clear-link" type="button" (click)="clearFilters()">Clear filters</button> }
+  </div>
+}
+
+@if (visibleTickets.length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">⌕</div>
+    <p>No tickets match your filters</p>
+    <button class="clear-button" type="button" (click)="clearFilters()">Clear filters</button>
+  </div>
+} @else {
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">ID</th><th scope="col">ISSUE</th><th scope="col">CATEGORY</th><th scope="col">STATUS</th></tr>
+      </thead>
+      <tbody>
+        @for (ticket of visibleTickets; track ticket.id) {
+          <tr
+            [class.row-action]="selectable || navigable"
+            [class.selected-row]="selectable && selectedId === ticket.id"
+            [tabindex]="selectable || navigable ? 0 : null"
+            [attr.aria-selected]="selectable ? selectedId === ticket.id : null"
+            (click)="activate(ticket)"
+            (keydown)="onRowKey($event, ticket)"
+          >
+            <td class="id-cell"><span [title]="ticket.id">{{ shortId(ticket.id) }}</span></td>
+            <td class="issue-cell">
+              <strong>{{ ticket.title }}</strong>
+              <small>{{ submittedDate(ticket.created_at) }}</small>
+            </td>
+            <td class="category-cell">{{ ticket.category }}</td>
+            <td><app-status-badge [status]="ticket.status" /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

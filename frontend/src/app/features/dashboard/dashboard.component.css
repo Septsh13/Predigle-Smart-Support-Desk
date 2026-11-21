@@ -1,0 +1,37 @@
+.dashboard-page { display: grid; gap: 20px; }
+.error-banner { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 15px; border: 1px solid #fecaca; border-radius: 9px; background: var(--danger-bg); color: var(--danger); font-size: 12px; }
+.error-banner strong { font-weight: 800; }
+.error-banner button { flex: 0 0 auto; padding: 6px 11px; border: 1px solid #e8a6a6; border-radius: 7px; background: #fff; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.stat-card { position: relative; display: flex; min-height: 132px; flex-direction: column; align-items: flex-start; justify-content: center; padding: 17px 19px; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 4px 14px rgba(46,16,101,.045); }
+.stat-card::before { position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, #7c3aed, #6d28d9); content: ''; }
+.stat-label { margin: 0 0 7px; color: var(--text-muted); font-size: 10px; font-weight: 800; letter-spacing: .09em; }
+.stat-card strong { color: var(--text); font-size: 27px; font-weight: 800; line-height: 1.15; letter-spacing: -.03em; }
+.stat-card small { margin-top: 6px; color: var(--text-muted); font-size: 11px; }
+.work-area { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(290px, 1fr); align-items: start; gap: 17px; }
+.recent-card, .preview-card { min-width: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 4px 14px rgba(46,16,101,.045); }
+.recent-card { padding: 18px 17px 8px; }
+.card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.card-heading h2, .preview-card h2 { margin: 0; color: var(--text); font-size: 16px; letter-spacing: -.01em; }
+.card-heading p { margin: 4px 0 0; color: var(--text-muted); font-size: 11px; }
+.card-heading a { color: var(--purple-800); font-size: 11px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.card-heading a:hover { color: var(--purple-700); text-decoration: underline; }
+.loading-state { display: grid; min-height: 190px; place-items: center; margin: 0; color: var(--text-muted); font-size: 12px; }
+.preview-card { min-height: 310px; padding: 20px; }
+.preview-topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 17px; }
+.ticket-id-label { color: var(--text-muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.preview-card h2 { font-size: 18px; line-height: 1.4; }
+.preview-description { margin: 9px 0 20px; color: var(--text-muted); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.preview-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid #efedf5; border-bottom: 1px solid #efedf5; }
+.preview-fields div { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.preview-fields span { color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+.preview-fields strong { color: var(--text); font-size: 11px; font-weight: 650; overflow-wrap: anywhere; }
+.resolution-box { margin-top: 15px; padding: 12px; border: 1px solid #a7f3d0; border-radius: 9px; background: var(--resolved-bg); }
+.resolution-box h3 { margin: 0; color: var(--resolved-text); font-size: 11px; }
+.resolution-box p { margin: 5px 0 0; color: var(--resolved-text); font-size: 11px; line-height: 1.55; }
+.open-ticket { width: 100%; margin-top: 17px; }
+.preview-empty { display: grid; min-height: 260px; align-content: center; }
+.preview-empty p { color: var(--text-muted); font-size: 12px; line-height: 1.6; }
+@media (max-width: 1100px) { .work-area { grid-template-columns: 1fr; } .preview-card { min-height: 0; } .preview-empty { min-height: 150px; } }
+@media (max-width: 850px) { .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 540px) { .dashboard-page { gap: 15px; } .stats-grid { gap: 9px; } .stat-card { min-height: 118px; padding: 15px 13px; } .stat-card strong { font-size: 23px; } .recent-card { padding: 15px 12px 7px; } .work-area { gap: 13px; } .preview-card { padding: 16px; } }

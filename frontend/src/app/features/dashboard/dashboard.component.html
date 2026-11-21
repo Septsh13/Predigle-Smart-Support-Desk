@@ -1,0 +1,81 @@
+<section class="dashboard-page">
+  @if (statsError() || ticketsError()) {
+    <div class="error-banner" role="alert">
+      <div><strong>Cannot reach the server.</strong> Is the backend running at http://127.0.0.1:8000?</div>
+      <button type="button" (click)="retry()">Retry</button>
+    </div>
+  }
+
+  <section class="stats-grid" aria-label="Ticket statistics">
+    <article class="stat-card">
+      <p class="stat-label">TOTAL TICKETS</p>
+      <strong>{{ statsLoading() ? 'Loading…' : (stats()?.total ?? '—') }}</strong>
+      <small>Across all categories</small>
+    </article>
+    <article class="stat-card">
+      <p class="stat-label">OPEN</p>
+      <strong>{{ statsLoading() ? 'Loading…' : (stats()?.open ?? '—') }}</strong>
+      <small>Need attention</small>
+    </article>
+    <article class="stat-card">
+      <p class="stat-label">IN PROGRESS</p>
+      <strong>{{ statsLoading() ? 'Loading…' : (stats()?.in_progress ?? '—') }}</strong>
+      <small>Being investigated</small>
+    </article>
+    <article class="stat-card">
+      <p class="stat-label">RESOLVED</p>
+      <strong>{{ statsLoading() ? 'Loading…' : (stats()?.resolved ?? '—') }}</strong>
+      <small>Available for suggestions</small>
+    </article>
+  </section>
+
+  <section class="work-area">
+    <article class="recent-card">
+      <header class="card-heading">
+        <div><h2>Recent tickets</h2><p>The latest issues from your support desk</p></div>
+        <a routerLink="/tickets">View all <span aria-hidden="true">→</span></a>
+      </header>
+      @if (ticketsLoading()) {
+        <p class="loading-state">Loading tickets…</p>
+      } @else if (ticketsError()) {
+        <p class="loading-state">Ticket list could not be loaded. Use Retry above.</p>
+      } @else {
+        <app-ticket-table
+          [tickets]="recentTickets()"
+          [filters]="filters"
+          [selectable]="true"
+          [selectedId]="selectedTicket()?.id ?? null"
+          (filtersChange)="onFiltersChange($event)"
+          (ticketSelected)="selectTicket($event)"
+        />
+      }
+    </article>
+
+    <aside class="preview-card" aria-label="Ticket detail preview">
+      @if (selectedTicket(); as ticket) {
+        <div class="preview-topline">
+          <span class="ticket-id-label">TICKET {{ shortId(ticket.id) }}</span>
+          <app-status-badge [status]="ticket.status" />
+        </div>
+        <h2>{{ ticket.title }}</h2>
+        <p class="preview-description">{{ ticket.description }}</p>
+
+        <div class="preview-fields">
+          <div><span>CATEGORY</span><strong>{{ ticket.category }}</strong></div>
+          <div><span>CREATED</span><strong>{{ relativeDate(ticket.created_at) }}</strong></div>
+        </div>
+
+        @if (ticket.status === 'Resolved' && ticket.resolution_note) {
+          <section class="resolution-box">
+            <h3>Resolution</h3>
+            <p>{{ ticket.resolution_note }}</p>
+          </section>
+        }
+
+        <a class="primary-button open-ticket" [routerLink]="['/tickets', ticket.id]">Open ticket</a>
+      } @else {
+        <div class="preview-empty"><h2>Ticket preview</h2><p>Select a ticket from the table to see its details.</p></div>
+      }
+    </aside>
+  </section>
+</section>

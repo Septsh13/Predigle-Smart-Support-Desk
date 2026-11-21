@@ -1,0 +1,31 @@
+<section class="ticket-list-page">
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      <div><strong>Cannot reach the server.</strong> Is the backend running at http://127.0.0.1:8000?</div>
+      <button type="button" (click)="retry()">Retry</button>
+    </div>
+  }
+
+  <article class="list-card">
+    <header class="list-heading">
+      <div><h2>All tickets</h2><p>Browse and filter support requests</p></div>
+      <a class="primary-button" routerLink="/tickets/new"><span aria-hidden="true">+</span> New ticket</a>
+    </header>
+
+    @if (loading()) {
+      <p class="loading-state">Loading tickets…</p>
+    } @else if (error()) {
+      <p class="loading-state">Ticket list could not be loaded. Use Retry above.</p>
+    } @else {
+      <app-ticket-table
+        [tickets]="tickets()"
+        [filters]="filters"
+        [showCount]="true"
+        [totalCount]="tickets().length"
+        [navigable]="true"
+        (filtersChange)="onFiltersChange($event)"
+        (ticketActivated)="openTicket($event)"
+      />
+    }
+  </article>
+</section>

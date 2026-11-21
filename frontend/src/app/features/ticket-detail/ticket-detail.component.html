@@ -1,0 +1,137 @@
+<section class="ticket-detail-page">
+  <a class="back-link" routerLink="/tickets"><span aria-hidden="true">←</span> Back to tickets</a>
+
+  @if (ticketLoading()) {
+    <article class="loading-card" aria-label="Loading ticket" aria-busy="true">
+      <div class="skeleton skeleton-short"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-meta"></div>
+    </article>
+  } @else if (ticketNotFound()) {
+    <article class="not-found-card">
+      <div class="not-found-icon" aria-hidden="true">?</div>
+      <h1>Ticket not found</h1>
+      <p>This ticket may have been removed or the link may be incorrect.</p>
+      <div class="not-found-actions">
+        <button class="secondary-button" type="button" (click)="retry()">Retry</button>
+        <a class="primary-button" routerLink="/tickets">Back to tickets</a>
+      </div>
+    </article>
+  } @else if (!ticket() && pageError()) {
+    <div class="error-banner" role="alert">
+      <span>{{ pageError() }}</span>
+      @if (retryAction()) { <button type="button" (click)="retry()">Retry</button> }
+    </div>
+  } @else {
+    @if (ticket(); as current) {
+    @if (toastMessage()) {
+      <div class="success-toast" role="status">{{ toastMessage() }}</div>
+    }
+
+    @if (pageError()) {
+      <div class="error-banner" role="alert">
+        <span>{{ pageError() }}</span>
+        @if (retryAction()) { <button type="button" (click)="retry()">Retry</button> }
+      </div>
+    }
+
+    <article class="ticket-card">
+      <header class="ticket-header">
+        <div class="ticket-heading-copy">
+          <span class="ticket-number">TICKET {{ shortId(current.id) }}</span>
+          <h1>{{ current.title }}</h1>
+        </div>
+        <app-status-badge [status]="current.status" />
+      </header>
+
+      <section class="description-section">
+        <h2>Description</h2>
+        <p>{{ current.description }}</p>
+      </section>
+
+      <section class="metadata-grid" aria-label="Ticket information">
+        <div><span>CATEGORY</span><strong>{{ current.category }}</strong></div>
+        <div><span>STATUS</span><app-status-badge [status]="current.status" /></div>
+        <div><span>CREATED</span><strong>{{ localDateTime(current.created_at) }}</strong></div>
+      </section>
+
+      <section class="resolution-section">
+        <h2>Resolution</h2>
+        @if (current.resolution_note) {
+          <div class="resolution-box"><p>{{ current.resolution_note }}</p></div>
+        } @else {
+          <p class="muted-note">No resolution yet.</p>
+        }
+      </section>
+    </article>
+
+    @if (roleService.role() === 'agent') {
+      <article class="agent-card">
+        <header class="section-heading">
+          <div><p class="eyebrow">SUPPORT AGENT</p><h2>Update ticket</h2></div>
+        </header>
+
+        <form (submit)="$event.preventDefault(); save()">
+          <div class="form-field">
+            <label for="ticket-status">Status</label>
+            <select id="ticket-status" [value]="formStatus()" [disabled]="isSaving()" (change)="onStatusChange($event)">
+              @for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }
+            </select>
+            @if (validationErrors().status) { <small class="field-error">{{ validationErrors().status }}</small> }
+          </div>
+
+          <div class="form-field">
+            <div class="label-row"><label for="resolution-note">Resolution note</label><span>{{ formNote().length }} / 1000</span></div>
+            <textarea
+              id="resolution-note"
+              rows="4"
+              maxlength="1000"
+              placeholder="Add what was done to resolve this ticket"
+              [value]="formNote()"
+              [disabled]="isSaving()"
+              (input)="onNoteInput($event)"
+            ></textarea>
+            @if (noteRequired) { <small class="required-hint">A resolution note is required when resolving a ticket.</small> }
+            @if (validationErrors().resolution_note) { <small class="field-error">{{ validationErrors().resolution_note }}</small> }
+          </div>
+
+          <button class="primary-button save-button" type="button" [disabled]="saveDisabled" (click)="save()">
+            {{ isSaving() ? 'Saving...' : 'Save changes' }}
+          </button>
+        </form>
+      </article>
+    } @else {
+      <p class="agent-hint">Switch to Support Agent (top right) to update this ticket.</p>
+    }
+
+    <section class="similar-card">
+      <header class="similar-heading">
+        <div><p class="eyebrow">KNOWLEDGE FROM PAST CASES</p><h2>Similar resolved tickets</h2></div>
+      </header>
+
+      @if (similarLoading()) {
+        <p class="similar-state">Finding similar resolved tickets…</p>
+      } @else if (similarError()) {
+        <div class="similar-error"><span>Could not load similar resolved tickets.</span><button type="button" (click)="retrySimilar()">Retry</button></div>
+      } @else if (similarTickets().length === 0) {
+        <p class="similar-state">No similar resolved tickets found.</p>
+      } @else {
+        <div class="similar-list">
+          @for (similar of similarTickets(); track similar.id) {
+            <a class="similar-ticket" [routerLink]="['/tickets', similar.id]">
+              <span class="similar-meta">{{ shortId(similar.id) }} <span aria-hidden="true">·</span> {{ similar.category }}</span>
+              <strong class="similar-title">{{ similar.title }}</strong>
+              <span class="match-label" [class.strong-match]="similar.match_label === 'Strong match'" [class.related-match]="similar.match_label === 'Related'">{{ similar.match_label }}</span>
+              <span class="similar-resolution">Resolved <span aria-hidden="true">·</span> {{ similar.resolution_note }}</span>
+            </a>
+          }
+        </div>
+      }
+
+      @if (disclaimer()) { <p class="similar-disclaimer">{{ disclaimer() }}</p> }
+    </section>
+    }
+  }
+</section>
